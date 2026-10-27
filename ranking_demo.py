@@ -144,19 +144,22 @@ def qe_bm25(index: BM25, hints: HintBundle, max_candidates: int = 50_000) -> lis
     """Average per-variant BM25 scores, mirroring the paper's QE-BM25.
 
     For each of the ten generated queries, append the three suggested brands,
-    score the corpus, retain its top max_candidates, then average scores by ID.
-    Missing scores contribute zero, like the paper's sparse score matrix.
+    score the corpus with all suggested brands, retain its top max_candidates
+    nonzero matches, then average scores by ID. Missing scores contribute zero,
+    like the paper's sparse score matrix.
     """
     if len(hints.generated_queries) != 10:
         raise ValueError("QE-BM25 expects exactly 10 generated query variants")
     total = Counter()
     ids = {p.product_id: p for p in index.products}
     for query in hints.generated_queries:
-        scores = index.scores(query + " " + " ".join(hints.brands[:3]))
-        top = sorted(scores.items(), key=lambda pair: (-pair[1], pair[0]))[:max_candidates]
+        scores = index.scores(query + " " + " ".join(hints.brands))
+        top = sorted(((pid, score) for pid, score in scores.items() if score > 0),
+                     key=lambda pair: (-pair[1], pair[0]))[:max_candidates]
         for product_id, score in top:
             total[product_id] += score / len(hints.generated_queries)
-    return sorted(((p, total[p.product_id]) for p in index.products), key=lambda row: (-row[1], row[0].product_id))
+    return sorted(((p, total[p.product_id]) for p in index.products if total[p.product_id] > 0),
+                   key=lambda row: (-row[1], row[0].product_id))
 
 
 def mrr(rankings: Iterable[Sequence[str]], qrels: Iterable[Mapping[str, int]], k: int | None = None) -> float:

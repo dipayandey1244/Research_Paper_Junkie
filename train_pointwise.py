@@ -36,6 +36,8 @@ def format_pair(row: dict[str, str], use_hints: bool, hint_strategy: str) -> str
     query = row["query"].strip()
     if use_hints:
         brands = [b.strip() for b in row.get("top_brands", "").split("|") if b.strip()][:3]
+        if len(brands) < 3:
+            raise ValueError("P+H requires three suggested brands in top_brands")
         if hint_strategy == "queries":
             query = row.get("hint_query", "").strip()
             if not query:
@@ -51,6 +53,7 @@ def format_pair(row: dict[str, str], use_hints: bool, hint_strategy: str) -> str
 
 def load_split(path: Path, split: str, use_hints: bool, hint_strategy: str) -> list[dict]:
     out = []
+    baseline_seen = {}
     with path.open(newline="", encoding="utf-8") as handle:
         for row in csv.DictReader(handle):
             if row.get("split", "").strip().lower() != split:
@@ -59,9 +62,21 @@ def load_split(path: Path, split: str, use_hints: bool, hint_strategy: str) -> l
             missing = [key for key in required if not row.get(key, "").strip()]
             if missing:
                 raise ValueError(f"{split} row missing fields {missing}: {row}")
-            out.append({"query_id": row["query_id"], "product_id": row["product_id"],
-                        "text": format_pair(row, use_hints, hint_strategy),
-                        "labels": normalize_label(row["label"])})
+            example = {"query_id": row["query_id"], "product_id": row["product_id"],
+                       "text": format_pair(row, use_hints, hint_strategy),
+                       "labels": normalize_label(row["label"])}
+            if not use_hints:
+                # P has one example per query/product. If the input CSV also
+                # contains reformulation rows for P+H, collapse those variants
+                # so the baseline is neither trained nor evaluated repeatedly.
+                key = (example["query_id"], example["product_id"])
+                prior = baseline_seen.get(key)
+                if prior:
+                    if prior["labels"] != example["labels"] or prior["text"] != example["text"]:
+                        raise ValueError(f"Conflicting baseline rows for query/product {key}")
+                    continue
+                baseline_seen[key] = example
+            out.append(example)
     if not out:
         raise ValueError(f"No rows with split={split!r} found in {path}")
     return out

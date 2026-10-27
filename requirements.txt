@@ -1,0 +1,6 @@
+numpy>=1.26
+# Install a CUDA-enabled PyTorch build appropriate for your machine.
+torch>=2.2
+transformers>=4.46
+datasets>=3.0
+accelerate>=1.0

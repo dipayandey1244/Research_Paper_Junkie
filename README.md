@@ -21,11 +21,11 @@ The local catalog contains 12 invented product records, two hand-authored four-b
 
 ## Train a pointwise reranker
 
-Prepare a CSV with columns `split,query_id,query,product_title,product_description,label`; `split` is `train`, `validation`, or `test`, and `label` is `irrelevant`, `relevant but not best`, or `relevant and best`. P+H also consumes `hint_reasoning`, `hint_features`, and `top_brands` (three brands separated by `|`). The script uses Qwen2.5 sequence classification, paper learning rate and per-device batch-size defaults, validation early stopping, and query-grouped held-out test MRR/Hit@K.
+Prepare a CSV with columns `split,query_id,product_id,query,product_title,product_description,label`; `split` is `train`, `validation`, or `test`, and `label` is `irrelevant`, `relevant but not best`, or `relevant and best`. For paper-best P+H, add `hint_query` (one reformulation per product row) and `top_brands` (brands separated by `|`). Repeat products across reformulations under the same `query_id`; held-out evaluation averages their scores by product. The feature-text ablation uses `hint_features` and `top_brands` instead. The script uses Qwen2.5 sequence classification, paper learning rate and per-device batch-size defaults, validation early stopping, and query-grouped held-out test MRR/Hit@K.
 
 ```bash
 pip install torch transformers datasets accelerate numpy
-python3 train_pointwise.py --data prepared_pairs.csv --model Qwen/Qwen2.5-0.5B-Instruct
+python3 train_pointwise.py --data prepared_pairs.csv --model Qwen/Qwen2.5-0.5B-Instruct --hint-strategy queries
 python3 train_pointwise.py --data prepared_pairs.csv --model Qwen/Qwen2.5-0.5B-Instruct --without-hints
 ```
 

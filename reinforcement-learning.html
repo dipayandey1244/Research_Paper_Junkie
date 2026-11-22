@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="An interactive walkthrough of exploration, multi-armed bandits, Q-learning, and Deep Q-Networks.">
+<title>Reinforcement Learning | Research Work</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script type="module" src="rl-lab.js"></script>
+<style>
+:root{--ink:#17213a;--muted:#495774;--blue:#2349a4;--line:#dbe3f0;--wash:#f5f8ff}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);background:#fff;font:1rem/1.65 system-ui,sans-serif}
+a{color:var(--blue);text-underline-offset:.2em}
+:focus-visible{outline:3px solid #4268cc;outline-offset:4px}
+.wrap{width:min(100% - 2rem,66rem);margin-inline:auto}
+.site-header{border-bottom:1px solid var(--line)}
+header nav,.controls{display:flex;align-items:center;gap:.75rem 1.2rem;flex-wrap:wrap}
+header nav{padding-block:1rem;justify-content:space-between}
+header nav a:first-child{font-weight:750;color:var(--ink)}
+.hero{background:var(--wash);border-bottom:1px solid var(--line);padding-block:clamp(2rem,6vw,5rem)}
+h1,h2,h3{font-family:Georgia,serif;line-height:1.13}
+h1{font-size:clamp(2.55rem,7vw,5.4rem);letter-spacing:-.045em;margin:0}
+h2{font-size:clamp(1.85rem,4vw,2.65rem);margin:0 0 1rem}
+h3{font-size:1.4rem;margin:1.4rem 0 .5rem}
+p{max-width:75ch;margin:.7rem 0 1rem}
+.hero p{font-size:1.13rem;color:var(--muted);max-width:57ch;margin-top:1rem}
+.toc{display:flex;flex-wrap:wrap;gap:.6rem 1.25rem;margin:1.4rem 0 0}
+section{scroll-margin-top:1rem;padding-block:2.25rem;border-bottom:1px solid var(--line)}
+.grid,.lab-grid{display:grid;gap:1rem;grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid>div,.panel{border:1px solid var(--line);border-radius:.6rem;padding:clamp(.9rem,2.8vw,1.5rem)}
+.grid h3,.panel h3{margin-top:0}
+.math,pre{background:var(--wash);border-left:4px solid #4268cc;padding:.65rem .85rem;overflow:auto}
+.math{font:1.15rem/1.5 Georgia,serif}
+.math div+div{margin-top:.35rem}
+.small,figcaption{color:var(--muted);font-size:.94rem}
+.panel{margin:1.1rem 0;background:white}
+label{display:grid;gap:.25rem;font-size:.92rem;font-weight:650}
+input,button{font:inherit}
+input{width:7rem;padding:.38rem .48rem;border:1px solid #8290ab;border-radius:.3rem}
+button{background:var(--blue);color:white;font-weight:650;padding:.44rem .75rem;border:1px solid var(--blue);border-radius:.32rem;cursor:pointer}
+button.secondary{background:white;color:var(--blue)}
+button:disabled{opacity:.6;cursor:wait}
+form button{align-self:end}
+figure{margin:1rem 0}
+canvas{display:block;width:100%;height:auto}
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;text-align:left;font-variant-numeric:tabular-nums}
+th,td{padding:.48rem .55rem;border-bottom:1px solid var(--line)}
+.board{display:grid;grid-template-columns:repeat(4,1fr);gap:.35rem;max-width:26rem}
+.cell{display:grid;place-items:center;min-height:3rem;border:1px solid #b9c6de;border-radius:.35rem;font-weight:650}
+.cell.route{background:#e6eeff}
+.cell.trap{background:#fce5e0}
+.cell.goal{background:#d9f3e7}
+.cell.active{box-shadow:inset 0 0 0 2px var(--blue)}
+.status{font-variant-numeric:tabular-nums}
+.lab-grid{align-items:start}
+.lab-grid .controls{margin-top:.2rem}
+li+li{margin-top:.35rem}
+footer{padding-block:1.5rem}
+@media(max-width:45rem){.grid,.lab-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="site-header"><nav class="wrap" aria-label="Main navigation">
+  <a href="index.html">← Research Work</a>
+  <a href="https://github.com/dipayandey1244/Research_Paper_Junkie/blob/main/README.md#reinforcement-learning">Implementation guide</a>
+</nav></header>
+<div class="hero"><div class="wrap">
+  <h1>Reinforcement learning</h1>
+  <p>Compare how agents explore uncertain actions, then train two agents to navigate the same grid using tabular Q-learning and a Deep Q-Network.</p>
+  <nav class="toc" aria-label="On this page">
+    <a href="#exploration">Explore vs. exploit</a><a href="#bandits">Multi-armed bandits</a>
+    <a href="#q-learning">Q-learning</a><a href="#dqn">Deep Q-Networks</a><a href="#practice">Practice</a>
+  </nav>
+</div></div>
+<main class="wrap">
+<section id="exploration" aria-labelledby="exploration-title">
+  <h2 id="exploration-title">Exploration and exploitation</h2>
+  <p>Exploit by choosing the action with the best current estimate. Explore by choosing an action that could improve future decisions. If one recommendation has 6 clicks in 10 impressions and another has 1 in 1, the second has the higher observed rate and much less evidence.</p>
+  <div class="grid">
+    <div><h3>Multi-armed bandit</h3><p>Each pull yields an immediate reward. With stationary arms, today’s choice changes what the agent knows while leaving the underlying reward probabilities fixed.</p></div>
+    <div><h3>Sequential decision problem</h3><p>In a Markov decision process, an action can change the next state and the rewards available later. A policy selects actions to maximize expected discounted return.</p></div>
+  </div>
+  <p><strong>Three ways to explore.</strong> Inject random actions (ε-greedy), favor uncertain estimates through an optimism bonus (UCB), or sample a plausible reward model from a posterior (Thompson Sampling). For an episodic task, a decaying ε schedule can shift the behavior toward exploitation as training progresses.</p>
+</section>
+
+<section id="bandits" aria-labelledby="bandit-title">
+  <h2 id="bandit-title">Multi-armed bandits</h2>
+  <p>Let N<sub>t</sub>(a) be the number of times arm a has been pulled before round t, and μ̂<sub>t</sub>(a) its sample mean. Only the chosen arm’s reward is observed.</p>
+  <h3>ε-greedy</h3>
+  <p>With probability ε, sample uniformly from all K arms. Otherwise, choose the largest sample mean. The greedy arm still has probability ε/K of being selected during exploration. Fixed ε keeps exploring throughout the run, including after a clear leader emerges.</p>
+  <h3>Upper Confidence Bound</h3>
+  <div class="math">Score(a) = μ̂<sub>t</sub>(a) + c √[ln(t) / N<sub>t</sub>(a)]</div>
+  <p>Pull every arm once before scoring. The bonus grows as an arm goes untested relative to the total number of rounds and shrinks as observations accumulate. Larger c prioritizes uncertainty.</p>
+  <h3>Thompson Sampling</h3>
+  <div class="math">p<sub>a</sub> | data ∼ Beta(1 + successes<sub>a</sub>, 1 + failures<sub>a</sub>)</div>
+  <p>For binary rewards, start each arm with a Beta(1, 1) prior. On each round, sample one probability from each posterior and pull the arm with the largest draw. Three successes and one failure give Beta(4, 2), with posterior mean 4/6. The action uses a draw from that distribution.</p>
+  <div class="panel">
+    <h3>Bandit simulator</h3>
+    <p>Four arms have true success rates of 25%, 45%, 55%, and 65%. The algorithms estimate those rates from rewards. Greedy is the comparison baseline.</p>
+    <form class="controls" id="bandit-form">
+      <label>Rounds<input id="rounds" type="number" min="10" max="1500" step="1" value="500" required></label>
+      <label>Seed<input id="bandit-seed" type="number" min="0" max="4294967295" step="1" value="42" required></label>
+      <label>ε-greedy ε<input id="epsilon" type="number" min="0" max="1" step=".01" value=".10" required></label>
+      <label>UCB coefficient c<input id="ucb-c" type="number" min="0" max="5" step=".05" value="1" required></label>
+      <button type="submit">Compare policies</button>
+    </form>
+    <figure>
+      <figcaption>Cumulative pseudo-regret (lower is better). Each pull adds the difference between the best arm’s true success probability and that of the chosen arm. The table identifies each curve by name and line style.</figcaption>
+      <canvas id="bandit-chart" width="860" height="300" aria-label="Cumulative pseudo-regret by round. Final values are in the table."></canvas>
+    </figure>
+    <div class="table-scroll"><table aria-label="Bandit results">
+      <thead><tr><th scope="col">Policy</th><th scope="col">Total reward</th><th scope="col">Pulls by arm (1–4)</th><th scope="col">Final pseudo-regret</th></tr></thead>
+      <tbody id="bandit-results"></tbody>
+    </table></div>
+    <p id="bandit-status" class="small" role="status"></p>
+  </div>
+</section>
+
+<section id="q-learning" aria-labelledby="q-title">
+  <h2 id="q-title">Q-learning</h2>
+  <p>Q(s,a) estimates the expected discounted return from taking a in state s and then acting optimally. Tabular Q-learning updates the value of the sampled state–action pair using the observed reward r and next state s′.</p>
+  <div class="math">
+    <div>y = r + γ max<sub>b</sub> Q(s′, b) for a continuing transition, and y = r at a terminal state.</div>
+    <div>Q(s,a) ← Q(s,a) + α [y − Q(s,a)]</div>
+  </div>
+  <p>Example: with Q(s,a)=0.20, r=0, γ=0.95, a best next-state value of 0.80, and α=0.35, the target is 0.76 and the new value is 0.396. The update is <strong>off-policy</strong>: the behavior can explore with ε-greedy while the target uses the greedy next action.</p>
+  <div class="panel lab-grid">
+    <div>
+      <h3>Tabular Gridworld</h3>
+      <div id="q-grid" class="board" role="group" aria-label="Tabular Gridworld policy"></div>
+      <p class="small">Arrows show the greedy action in each cell. Shading traces the greedy route. The outlined cell shows the current training position.</p>
+    </div>
+    <div>
+      <p>Goal gives +1, traps give −1, and other moves cost 0.04. The shortest safe route has six moves. Training starts in the top-left with ε=0.25, α=0.35, and γ=0.95.</p>
+      <div class="controls"><button id="q-step">Advance one step</button><button id="q-train">Train 75 episodes</button><button class="secondary" id="q-reset">Reset</button></div>
+      <p id="q-status" class="status" role="status"></p>
+      <p id="q-update" class="small"></p>
+    </div>
+  </div>
+</section>
+
+<section id="dqn" aria-labelledby="dqn-title">
+  <h2 id="dqn-title">Deep Q-Networks</h2>
+  <p>When a Q-table becomes too large, a network Q<sub>θ</sub>(s,·) can represent action values with shared weights. In this demo it maps a one-hot state through two ReLU layers to four action values.</p>
+  <ol>
+    <li>Use ε-greedy with the online network and store (s, a, r, s′, done) in replay memory.</li>
+    <li>Sample a minibatch from replay. Replay mixes experience from different points in training.</li>
+    <li>For continuing transitions, compute y = r + γ max<sub>b</sub> Q<sub>θ⁻</sub>(s′, b) using the frozen target network. At a terminal transition, use y = r.</li>
+    <li>Minimize Huber loss between Q<sub>θ</sub>(s,a) and y. Periodically copy the online weights to the target network.</li>
+  </ol>
+  <p>The max can overestimate action values when predictions are noisy. Double DQN addresses that by choosing the next action with the online network and evaluating it with the target network. This lab uses the standard DQN target.</p>
+  <div class="panel lab-grid">
+    <div><h3>DQN Gridworld</h3><div id="dqn-grid" class="board" role="group" aria-label="DQN Gridworld policy"></div>
+    <p class="small">Both labs evaluate greedily from the same start. This network trains with some randomized safe starts to collect more diverse experience.</p></div>
+    <div>
+      <p>The browser trains the network locally. Watch replay fill and compare the greedy route before and after training. Batch loss describes the latest update. A shorter safe route is the task-level objective.</p>
+      <div class="controls"><button id="dqn-train">Train 100 episodes</button><button class="secondary" id="dqn-reset">Reset</button></div>
+      <p id="dqn-status" class="status" role="status"></p>
+    </div>
+  </div>
+</section>
+
+<section id="practice" aria-labelledby="practice-title">
+  <h2 id="practice-title">Practice and references</h2>
+  <ul>
+    <li>Set ε to zero and rerun the bandit lab across three seeds. Compare selection counts to see when greedy commits to a weaker arm.</li>
+    <li>Reset Q-learning. Step through an update into a trap and verify why the target is exactly −1.</li>
+    <li>Train DQN in 100-episode blocks. Record the greedy route alongside the latest loss. Use the training settings in the guide to explain what changes between blocks.</li>
+  </ul>
+  <p>Read <a href="https://mitpress.ublish.com/book/reinforcement-learning-an-introduction-2">Sutton and Barto, Chapters 2 and 6</a>, <a href="https://arxiv.org/abs/1707.02038">Russo et al. on Thompson Sampling</a>, <a href="https://www.gatsby.ucl.ac.uk/~dayan/papers/wd92.html">Watkins and Dayan on Q-learning</a>, and <a href="https://www.nature.com/articles/nature14236">Mnih et al. on DQN</a>.</p>
+</section>
+<noscript><p>The interactive labs require JavaScript. The walkthrough and formulas remain available above.</p></noscript>
+</main>
+<footer class="wrap"><a href="index.html">Research Work</a></footer>
+</body>
+</html>

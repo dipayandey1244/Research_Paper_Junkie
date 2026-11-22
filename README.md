@@ -1,10 +1,16 @@
-# Hint-Augmented Re-ranking · Research Work
+# Research Work
+
+The [homepage](https://dipayandey1244.github.io/Research_Paper_Junkie/) links to the Hint-Augmented Re-ranking walkthrough and the [Sleep Framework walkthrough](https://dipayandey1244.github.io/Research_Paper_Junkie/sleep-framework.html), which includes a runnable continual-learning experiment.
+
+## Hint-Augmented Re-ranking
 
 Interactive walkthrough and implementation of the key methods in Zhu, Vedula, and Malmasi (AACL 2025), [“Hint-Augmented Re-ranking: Efficient Product Search using LLM-Based Query Decomposition”](https://aclanthology.org/2025.ijcnlp-short.19/).
 
 ## Files
 
-- `index.html` — single-file article, paper results, and interactive BM25/QE-BM25 explorer
+- `index.html` — homepage for the research walkthroughs
+- `hint-augmented-reranking.html` — article, paper results, and interactive BM25/QE-BM25 explorer
+- `sleep-framework.html` — Google Research Sleep Framework walkthrough and experiments
 - `ranking_demo.py` — dependency-free Okapi BM25 and ten-variant QE-BM25 implementation with MRR and Hit@K
 - `train_pointwise.py` — Hugging Face/PyTorch fine-tuning path for the paper's pointwise Qwen P and P+H rerankers
 - `favicon.svg` — article favicon
